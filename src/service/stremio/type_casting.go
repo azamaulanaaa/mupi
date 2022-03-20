@@ -1,9 +1,8 @@
-package torrentio
+package stremio
 
 import (
 	"context"
 	"errors"
-	"time"
 
 	"go.uber.org/zap"
 )
@@ -14,15 +13,14 @@ var (
 
 type Config struct {
 	Logger  *zap.Logger
-	Host    string
-	Timeout time.Duration
+	BaseUrl string
 }
 
-type Torrentio interface {
-	Stream(ctx context.Context, typee string, id string) (res StremsResponse, err error)
+type Stremio interface {
+	Stream(ctx context.Context, typee string, id string) (res StreamsResponse, err error)
 }
 
-type StremsResponse struct {
+type StreamsResponse struct {
 	Streams         []StreamItem `json:"streams,omitempty"`
 	CacheMaxAge     uint32       `json:"cacheMaxAge"`
 	StaleRevalidate uint32       `json:"staleRevalidate"`
@@ -59,11 +57,17 @@ type CatalogItem struct {
 }
 
 type Manifest struct {
-	Id          string        `json:"id"`
-	Version     string        `json:"version"`
-	Name        string        `json:"name"`
-	Description string        `json:"description"`
-	Types       []string      `json:"types"`
-	Catalogs    []CatalogItem `json:"catalogs"`
-	Resources   []string      `json:"resources"`
+	Id          string         `json:"id"`
+	Version     string         `json:"version"`
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
+	Types       []string       `json:"types"`
+	Catalogs    []CatalogItem  `json:"catalogs"`
+	Resources   []ResourceItem `json:"resources"`
+}
+
+type ResourceItem struct {
+	Name       string   `json:"name"`
+	Types      []string `json:"types"`
+	IdPrefixes []string `json:"idPrefixes"`
 }
