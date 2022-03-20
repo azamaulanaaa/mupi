@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gojek/heimdall/v7/httpclient"
 )
@@ -18,7 +19,7 @@ type imdb_impl struct {
 func New(config Config) IMDB {
 	imdb := imdb_impl{
 		config:     config,
-		httpClient: httpclient.NewClient(httpclient.WithHTTPTimeout(config.Timeout)),
+		httpClient: httpclient.NewClient(httpclient.WithHTTPTimeout(30 * time.Second)),
 	}
 
 	return &imdb
@@ -37,7 +38,20 @@ func (imdb *imdb_impl) Search(ctx context.Context, query string) (movies []Movie
 	}
 
 	{
-		httpRes, err := imdb.httpClient.Get(url, nil)
+		var req *http.Request
+		{
+			req, err = http.NewRequestWithContext(
+				ctx,
+				http.MethodGet,
+				url,
+				nil,
+			)
+			if err != nil {
+				return movies, err
+			}
+		}
+
+		httpRes, err := imdb.httpClient.Do(req)
 		if err != nil {
 			return movies, err
 		}

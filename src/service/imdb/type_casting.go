@@ -3,7 +3,6 @@ package imdb
 import (
 	"context"
 	"errors"
-	"time"
 
 	"go.uber.org/zap"
 )
@@ -15,7 +14,6 @@ var (
 type Config struct {
 	Logger  *zap.Logger
 	BaseUrl string
-	Timeout time.Duration
 }
 
 type IMDB interface {
