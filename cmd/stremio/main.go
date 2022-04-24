@@ -22,6 +22,7 @@ func main() {
 			port = uint16(portEnv)
 		}
 	}
+
 	var svc service.Service
 	{
 		var dir string
@@ -35,9 +36,9 @@ func main() {
 		var err error
 		svcConfig := service.Config{
 			Logger:               zap.NewExample(),
-			CacheLifetime:        5 * time.Minute,
-			CacheCleanUpInterval: 1 * time.Second,
 			CacheFs:              afero.NewBasePathFs(afero.NewOsFs(), dir),
+			CacheLifetime:        30 * time.Minute,
+			CacheCleanUpInterval: 5 * time.Second,
 			Timeout:              30 * time.Second,
 			Port:                 port,
 		}
