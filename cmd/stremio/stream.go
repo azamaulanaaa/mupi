@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func StreamHandler(svc service.Service, host string) gin.HandlerFunc {
+func StreamHandler(svc service.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var typee uint
 		{
@@ -38,7 +38,7 @@ func StreamHandler(svc service.Service, host string) gin.HandlerFunc {
 			for _, v := range streams {
 				res.Streams = append(res.Streams, stremio.StreamItem{
 					Title: v.Name,
-					Url:   fmt.Sprintf("http://%s/torrent/%s/%d", host, v.InfoHash, v.Index),
+					Url:   fmt.Sprintf("http://%s/torrent/%s/%d", c.Request.Host, v.InfoHash, v.Index),
 				})
 			}
 

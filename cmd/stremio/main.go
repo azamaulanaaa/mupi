@@ -1,7 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"mupi/src/service"
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -10,9 +13,15 @@ import (
 	"go.uber.org/zap"
 )
 
-const timeout = 5 * time.Second
-
 func main() {
+	var port uint16
+	{
+		port = 8080
+		portEnvStr := os.Getenv("PORT")
+		if portEnv, err := strconv.Atoi(portEnvStr); err != nil && portEnv != 0 {
+			port = uint16(portEnv)
+		}
+	}
 	var svc service.Service
 	{
 		var err error
@@ -22,7 +31,7 @@ func main() {
 			CacheLifetime:        5 * time.Minute,
 			CacheCleanUpInterval: 1 * time.Second,
 			Timeout:              30 * time.Second,
-			Port:                 8080,
+			Port:                 port,
 		}
 		svc, err = service.New(svcConfig)
 		must(err)
@@ -40,18 +49,16 @@ func main() {
 		router.Use(cors.New(corsConfig))
 	}
 
-	var host string
-	{
-		host = "localhost:8080"
-	}
-
 	{
 		router.GET("manifest.json", ManifestHandler(svc))
-		router.GET("stream/:type/:id", StreamHandler(svc, host))
+		router.GET("stream/:type/:id", StreamHandler(svc))
 		router.GET("torrent/:infohash/:index", TorrentHandler(svc))
 	}
 
-	router.Run(host)
+	{
+		host := fmt.Sprintf(":%d", port)
+		router.Run(host)
+	}
 }
 
 func must(err error) {
