@@ -24,12 +24,20 @@ func main() {
 	}
 	var svc service.Service
 	{
+		var dir string
+		{
+			var err error
+			dir, err = os.MkdirTemp("", "mupi-*")
+			must(err)
+			defer os.RemoveAll(dir)
+		}
+
 		var err error
 		svcConfig := service.Config{
 			Logger:               zap.NewExample(),
-			CacheFs:              afero.NewBasePathFs(afero.NewOsFs(), "./cache/"),
 			CacheLifetime:        5 * time.Minute,
 			CacheCleanUpInterval: 1 * time.Second,
+			CacheFs:              afero.NewBasePathFs(afero.NewOsFs(), dir),
 			Timeout:              30 * time.Second,
 			Port:                 port,
 		}
